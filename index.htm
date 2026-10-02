@@ -76,8 +76,8 @@
     /* ==========================================
        動態漸層標題與雲端編輯特效
        ========================================== */
-    .page-header { text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
-    .title-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+    .page-header { text-align: center; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; }
+    .title-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
 
     /* 炫彩流動文字特效 */
     .page-title {
@@ -100,15 +100,50 @@
 
     .edit-btn {
       background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #fff; border-radius: 50%; width: 44px; height: 44px;
+      color: #fff; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px;
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
     .edit-btn:hover { background: #00f2fe; border-color: #00f2fe; transform: scale(1.15) rotate(8deg); box-shadow: 0 0 20px rgba(0, 242, 254, 0.6); }
+    .edit-btn.small { width: 34px; height: 34px; font-size: 14px; }
 
     .page-subtitle { font-size: 16px; color: #b5b5c3; margin: 0; font-weight: 500; letter-spacing: 0.5px; }
     .date-highlight { color: #00f2fe; font-weight: 700; text-shadow: 0 0 8px rgba(0, 242, 254, 0.4); }
+
+    /* ==========================================
+       臨時宣佈橫幅 (Announcement Banner)
+       ========================================== */
+    .announcement-wrapper {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 18px; padding: 8px 16px 8px 20px;
+      background: linear-gradient(90deg, rgba(255, 36, 66, 0.15) 0%, rgba(255, 36, 66, 0.05) 100%);
+      border-left: 4px solid #ff2442;
+      border-radius: 8px; backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(255, 36, 66, 0.15);
+      transition: all 0.3s ease;
+      max-width: 90%;
+    }
+    .announcement-wrapper.editing {
+      background: rgba(0, 0, 0, 0.7); border-color: #00f2fe;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+    }
+
+    .announcement-label {
+      font-weight: 800; color: #ff3355; letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(255, 36, 66, 0.4); white-space: nowrap;
+    }
+
+    .announcement-text {
+      color: #fff; font-size: 15px; font-weight: 500;
+      outline: none; min-width: 200px; padding: 4px 8px; border-radius: 6px;
+      transition: background 0.2s; word-break: break-word; text-align: left;
+    }
+    .announcement-text.editing { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+    @media (max-width: 768px) {
+      .announcement-wrapper { flex-direction: column; align-items: center; text-align: center; border-left: none; border-top: 4px solid #ff2442; }
+    }
 
     /* ==========================================
        播放器與 UI 介面
@@ -208,6 +243,13 @@
         <button class="edit-btn" id="edit-title-btn" onclick="toggleEditTitle()" title="修改標題並同步">✏️</button>
       </div>
       <p class="page-subtitle" id="page-subtitle">今天是 <span class="date-highlight" id="today-date">載入中...</span>，歡迎收看 LTMPS 校園電視台直播，請耐心等候節目開始。</p>
+      
+      <!-- ▼▼▼ 臨時宣佈區塊 ▼▼▼ -->
+      <div class="announcement-wrapper" id="ann-wrapper">
+        <span class="announcement-label">🚨 臨時宣佈：</span>
+        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">目前無特別宣佈事項</span>
+        <button class="edit-btn small" id="edit-ann-btn" onclick="toggleEditAnnouncement()" title="修改臨時宣佈">✏️</button>
+      </div>
     </div>
 
     <!-- 播放器區塊 -->
@@ -225,7 +267,7 @@
 
         <div class="bar-right">
           <button type="button" class="btn btn-fs" id="fs-btn" onclick="toggleFullScreen()" title="全螢幕切換">⛶ 全螢幕</button>
-          <button type="button" class="btn" id="auto-btn" onclick="toggleAutoRefresh()" title="開啟每 5 秒自動重整">⏱️ 開始自動刷新</button>
+          <button type="button" class="btn" id="auto-btn" onclick="toggleAutoRefresh()" title="開啟每 5 秒自動重整">⏱️️ 開始自動刷新</button>
           <button type="button" class="btn btn-reload" onclick="manualReload()" title="手動立即刷新檢查">🔄 立即重試</button>
           <a id="yt-external-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-link">YouTube 觀看 ➔</a>
         </div>
@@ -251,7 +293,7 @@
     updateTodayDate();
 
     // ==========================================
-    // Firebase 即時標題同步系統
+    // Firebase 即時標題與宣佈同步系統
     // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyBr0-oNmRN859g6bfGDVjSdA1brJC8CxNs",
@@ -266,60 +308,87 @@
     const db = firebase.firestore();
 
     const titleEl = document.getElementById('page-title');
-    const editBtn = document.getElementById('edit-title-btn');
+    const editTitleBtn = document.getElementById('edit-title-btn');
+    
+    const annEl = document.getElementById('page-announcement');
+    const annWrapper = document.getElementById('ann-wrapper');
+    const editAnnBtn = document.getElementById('edit-ann-btn');
 
-    // 監聽雲端資料 (所有觀眾都會觸發，達到瞬間同步)
+    // 監聽雲端資料 (所有觀眾都會觸發，瞬間同步標題與宣佈)
     db.collection("settings").doc("live").onSnapshot((doc) => {
       if (doc.exists) {
         const data = doc.data();
-        // 如果目前不在「編輯模式」才覆寫文字，避免打字到一半被覆蓋
+        
+        // 更新標題 (如果當前沒在編輯狀態)
         if (data.title && titleEl.contentEditable !== "true") {
           titleEl.innerText = data.title;
         }
+        
+        // 更新臨時宣佈 (如果當前沒在編輯狀態)
+        if (data.announcement !== undefined && annEl.contentEditable !== "true") {
+          annEl.innerText = data.announcement || "目前無特別宣佈事項";
+        }
+
       } else {
         if(titleEl.contentEditable !== "true") titleEl.innerText = "本日電視台直播";
+        if(annEl.contentEditable !== "true") annEl.innerText = "目前無特別宣佈事項";
       }
     });
 
-    // 編輯與雲端儲存邏輯
+    // 編輯【標題】邏輯
     function toggleEditTitle() {
       const isEditing = titleEl.isContentEditable === "true";
       
       if (isEditing) {
-        // [儲存動作] 退出編輯並寫入 Firebase
         titleEl.contentEditable = "false";
         titleEl.classList.remove('editing');
-        editBtn.innerText = "✏️";
-        editBtn.title = "修改標題並同步";
+        editTitleBtn.innerText = "✏️️";
+        editTitleBtn.title = "修改標題並同步";
         
         const newTitle = titleEl.innerText.trim() || "本日電視台直播";
-        
-        db.collection("settings").doc("live").set({
-          title: newTitle
-        }, { merge: true })
-        .then(() => { console.log("✅ 標題已同步至所有觀眾！"); })
-        .catch((error) => {
-          console.error("寫入失敗: ", error);
-          alert("儲存失敗！請確認 Firebase 資料庫 (Firestore) 的 Rules 已設定為允許寫入 (allow write: if true;)。");
-        });
-
+        db.collection("settings").doc("live").set({ title: newTitle }, { merge: true }).catch(e => console.error(e));
       } else {
-        // [進入編輯動作]
         titleEl.contentEditable = "true";
         titleEl.classList.add('editing');
         titleEl.focus();
-        editBtn.innerText = "💾";
-        editBtn.title = "儲存並同步至所有觀眾畫面";
+        editTitleBtn.innerText = "💾";
+        editTitleBtn.title = "儲存並同步至所有觀眾";
       }
     }
 
-    // 支援按下 Enter 鍵直接儲存
-    titleEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // 阻止換行
-        toggleEditTitle(); // 觸發儲存
+    // 編輯【臨時宣佈】邏輯
+    function toggleEditAnnouncement() {
+      const isEditing = annEl.isContentEditable === "true";
+      
+      if (isEditing) {
+        annEl.contentEditable = "false";
+        annEl.classList.remove('editing');
+        annWrapper.classList.remove('editing');
+        editAnnBtn.innerText = "✏️";
+        editAnnBtn.title = "修改臨時宣佈";
+        
+        const newAnn = annEl.innerText.trim();
+        db.collection("settings").doc("live").set({ announcement: newAnn }, { merge: true }).catch(e => console.error(e));
+      } else {
+        annEl.contentEditable = "true";
+        annEl.classList.add('editing');
+        annWrapper.classList.add('editing');
+        annEl.focus();
+        editAnnBtn.innerText = "💾";
+        editAnnBtn.title = "儲存並同步宣佈";
       }
+    }
+
+    // 支援按下 Enter 鍵直接儲存 (標題)
+    titleEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); toggleEditTitle(); }
     });
+    
+    // 支援按下 Enter 鍵直接儲存 (宣佈)
+    annEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); toggleEditAnnouncement(); }
+    });
+
 
     // ==========================================
     // 試算表排程與播放器系統
