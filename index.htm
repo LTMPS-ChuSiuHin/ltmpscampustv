@@ -18,14 +18,8 @@
       overflow-x: hidden;
     }
 
-    /* 極光流動背景特效 */
-    .aurora-bg {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
-    }
-    .aurora-orb {
-      position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.45; 
-      animation: orbit 20s linear infinite;
-    }
+    .aurora-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
+    .aurora-orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.45; animation: orbit 20s linear infinite; }
     .orb-1 { width: 50vw; height: 50vw; background: #4facfe; top: -10%; left: -10%; }
     .orb-2 { width: 60vw; height: 60vw; background: #ff0844; bottom: -20%; right: -10%; animation-direction: reverse; animation-duration: 25s; }
     .orb-3 { width: 45vw; height: 45vw; background: #9b23ea; top: 30%; left: 30%; animation-duration: 30s; opacity: 0.35;}
@@ -35,40 +29,29 @@
       100% { transform: rotate(360deg) translateX(50px) rotate(-360deg); } 
     }
 
-    /* 頂部導航列 (幻彩毛玻璃) */
     .navbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 30px;
-      background: rgba(10, 10, 15, 0.65);
+      padding: 12px 30px; background: rgba(10, 10, 15, 0.65);
       backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); position: sticky; top: 0; z-index: 1000;
     }
 
-    .nav-brand {
-      display: flex; align-items: center; gap: 14px;
-      font-size: 18px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; cursor: default; 
-    }
+    .nav-brand { display: flex; align-items: center; gap: 14px; font-size: 18px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; cursor: default; }
 
-    /* 發光 Logo 特效 */
     .nav-brand-icon {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      width: 38px; height: 38px; background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
       border-radius: 10px; display: flex; align-items: center; justify-content: center;
       color: white; font-weight: 900; font-size: 16px;
-      box-shadow: 0 0 20px rgba(0, 198, 255, 0.6);
-      animation: pulse-logo 3s infinite alternate;
+      box-shadow: 0 0 20px rgba(0, 198, 255, 0.6); animation: pulse-logo 3s infinite alternate;
     }
     @keyframes pulse-logo { 0% { box-shadow: 0 0 10px rgba(0, 198, 255, 0.4); } 100% { box-shadow: 0 0 25px rgba(0, 198, 255, 0.8); } }
 
     .nav-links { display: flex; gap: 8px; }
     .nav-link.active {
-      color: #fff; font-weight: 700; font-size: 14px; padding: 10px 22px;
-      border-radius: 20px;
+      color: #fff; font-weight: 700; font-size: 14px; padding: 10px 22px; border-radius: 20px;
       background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
     }
 
     .main-content { max-width: 1150px; margin: 0 auto; padding: 40px 24px 80px; }
@@ -79,106 +62,61 @@
     .page-header { text-align: center; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; }
     .title-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
 
-    /* 炫彩流動文字特效 */
     .page-title {
       font-size: 46px; font-weight: 900; margin: 0;
       background: linear-gradient(270deg, #ff8a00, #e52e71, #9d00ff, #00f2fe, #4facfe);
-      background-size: 400% 400%;
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: gradient-text 8s ease infinite;
-      letter-spacing: 1px; padding: 4px 16px; border-radius: 12px;
+      background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: gradient-text 8s ease infinite; letter-spacing: 1px; padding: 4px 16px; border-radius: 12px;
       transition: all 0.3s ease; outline: none; min-width: 250px;
     }
     @keyframes gradient-text { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-    /* 進入編輯模式的狀態 */
-    .page-title.editing {
-      background: rgba(0, 0, 0, 0.6); -webkit-text-fill-color: #fff;
-      box-shadow: 0 0 0 2px #00f2fe, 0 0 20px rgba(0, 242, 254, 0.5);
-      animation: none;
-    }
+    .page-title.editing { background: rgba(0, 0, 0, 0.6); -webkit-text-fill-color: #fff; box-shadow: 0 0 0 2px #00f2fe, 0 0 20px rgba(0, 242, 254, 0.5); animation: none; }
 
     .edit-btn {
       background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
       color: #fff; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
     .edit-btn:hover { background: #00f2fe; border-color: #00f2fe; transform: scale(1.15) rotate(8deg); box-shadow: 0 0 20px rgba(0, 242, 254, 0.6); }
     .edit-btn.small { width: 34px; height: 34px; font-size: 14px; }
+    
+    /* 儲存成功時的特效 */
+    .edit-btn.success { background: #38ef7d; border-color: #38ef7d; box-shadow: 0 0 20px rgba(56, 239, 125, 0.8); transform: scale(1.1); }
 
     .page-subtitle { font-size: 16px; color: #b5b5c3; margin: 0; font-weight: 500; letter-spacing: 0.5px; }
     .date-highlight { color: #00f2fe; font-weight: 700; text-shadow: 0 0 8px rgba(0, 242, 254, 0.4); }
 
     /* ==========================================
-       臨時宣佈橫幅 (Announcement Banner)
+       臨時宣佈橫幅
        ========================================== */
     .announcement-wrapper {
-      display: flex; align-items: center; gap: 12px;
-      margin-top: 18px; padding: 8px 16px 8px 20px;
+      display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 8px 16px 8px 20px;
       background: linear-gradient(90deg, rgba(255, 36, 66, 0.15) 0%, rgba(255, 36, 66, 0.05) 100%);
-      border-left: 4px solid #ff2442;
-      border-radius: 8px; backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(255, 36, 66, 0.15);
-      transition: all 0.3s ease;
-      max-width: 90%;
+      border-left: 4px solid #ff2442; border-radius: 8px; backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(255, 36, 66, 0.15); transition: all 0.3s ease; max-width: 90%;
     }
-    .announcement-wrapper.editing {
-      background: rgba(0, 0, 0, 0.7); border-color: #00f2fe;
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
-    }
+    .announcement-wrapper.editing { background: rgba(0, 0, 0, 0.7); border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
 
-    .announcement-label {
-      font-weight: 800; color: #ff3355; letter-spacing: 0.5px;
-      text-shadow: 0 0 10px rgba(255, 36, 66, 0.4); white-space: nowrap;
-    }
-
-    .announcement-text {
-      color: #fff; font-size: 15px; font-weight: 500;
-      outline: none; min-width: 200px; padding: 4px 8px; border-radius: 6px;
-      transition: background 0.2s; word-break: break-word; text-align: left;
-    }
+    .announcement-label { font-weight: 800; color: #ff3355; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(255, 36, 66, 0.4); white-space: nowrap; }
+    .announcement-text { color: #fff; font-size: 15px; font-weight: 500; outline: none; min-width: 200px; padding: 4px 8px; border-radius: 6px; transition: background 0.2s; word-break: break-word; text-align: left; }
     .announcement-text.editing { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
-    @media (max-width: 768px) {
-      .announcement-wrapper { flex-direction: column; align-items: center; text-align: center; border-left: none; border-top: 4px solid #ff2442; }
-    }
+    @media (max-width: 768px) { .announcement-wrapper { flex-direction: column; align-items: center; text-align: center; border-left: none; border-top: 4px solid #ff2442; } }
 
     /* ==========================================
        播放器與 UI 介面
        ========================================== */
-    .live-player-container {
-      width: 100%; background-color: #050505; border-radius: 20px; overflow: hidden; 
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 255, 255, 0.05);
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
-    }
-
-    .live-player-container.is-live {
-      border-color: rgba(255, 36, 66, 0.6);
-      box-shadow: 0 0 50px rgba(255, 36, 66, 0.4), 0 25px 60px rgba(0, 0, 0, 0.8);
-    }
-
-    .live-player-container.fake-fullscreen {
-      position: fixed !important; top: 0 !important; left: 0 !important;
-      width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important;
-      z-index: 2147483647 !important; border-radius: 0 !important; border: none !important;
-      display: flex !important; flex-direction: column !important; background: #000 !important;
-    }
+    .live-player-container { width: 100%; background-color: #050505; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 255, 255, 0.05); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .live-player-container.is-live { border-color: rgba(255, 36, 66, 0.6); box-shadow: 0 0 50px rgba(255, 36, 66, 0.4), 0 25px 60px rgba(0, 0, 0, 0.8); }
+    .live-player-container.fake-fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; z-index: 2147483647 !important; border-radius: 0 !important; border: none !important; display: flex !important; flex-direction: column !important; background: #000 !important; }
     .live-player-container.fake-fullscreen .video-wrapper { flex: 1 1 auto !important; aspect-ratio: auto !important; height: 100% !important; }
-    
     .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; background-color: #000; }
     .video-wrapper iframe, .video-wrapper #player-slot { width: 100%; height: 100%; display: block; border: 0; }
 
-    .live-custom-bar {
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-      gap: 12px; padding: 16px 22px; 
-      background: rgba(15, 15, 20, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 14px; color: #fff;
-    }
+    .live-custom-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 22px; background: rgba(15, 15, 20, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 14px; color: #fff; }
     .bar-left, .bar-right { display: flex; align-items: center; gap: 14px; }
-
     .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
     .dot.waiting { background: linear-gradient(45deg, #f6d365, #fda085); animation: pulse-colorful 2s infinite; }
     .dot.live { background: #ff2442; box-shadow: 0 0 16px #ff2442, 0 0 32px #ff2442; animation: pulse-live 1s infinite alternate; }
@@ -189,54 +127,35 @@
     .status-title { font-weight: 800; letter-spacing: 1px; }
     .status-hint { color: #a1a1b5; font-size: 12px; }
 
-    /* 炫彩按鈕特效 */
-    .btn {
-      color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;
-      padding: 9px 18px; cursor: pointer; font-size: 13px; font-weight: 700; 
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
+    .btn { color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 9px 18px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); }
     #auto-btn { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-color: #38ef7d; }
     #auto-btn.active-refresh { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); border-color: #ff4b2b; }
     .btn-reload { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #764ba2; }
     .btn-fs { background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%); border-color: #635694; }
-
-    .btn:hover {
-      transform: translateY(-4px); filter: brightness(1.2);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); border-color: #fff;
-    }
+    .btn:hover { transform: translateY(-4px); filter: brightness(1.2); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); border-color: #fff; }
     .btn:active { transform: translateY(0); }
 
-    .btn-link {
-      background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      text-decoration: none; font-size: 14px; font-weight: 800; padding: 6px 8px;
-      transition: all 0.3s ease;
-    }
+    .btn-link { background: linear-gradient(to right, #f6d365 0%, #fda085 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; font-size: 14px; font-weight: 800; padding: 6px 8px; transition: all 0.3s ease; }
     .btn-link:hover { filter: brightness(1.3) drop-shadow(0 0 12px rgba(253, 160, 133, 0.6)); }
   </style>
 </head>
 <body>
 
-  <!-- 極光幻彩背景特效 -->
+  <!-- 背景特效 -->
   <div class="aurora-bg">
-    <div class="aurora-orb orb-1"></div>
-    <div class="aurora-orb orb-2"></div>
-    <div class="aurora-orb orb-3"></div>
+    <div class="aurora-orb orb-1"></div><div class="aurora-orb orb-2"></div><div class="aurora-orb orb-3"></div>
   </div>
 
   <header class="navbar">
     <div class="nav-brand">
-      <div class="nav-brand-icon">TV</div>
-      LTMPS Campus TV
+      <div class="nav-brand-icon">TV</div> LTMPS Campus TV
     </div>
-    <nav class="nav-links">
-      <span class="nav-link active">本日電視台直播</span>
-    </nav>
+    <nav class="nav-links"><span class="nav-link active">本日電視台直播</span></nav>
   </header>
 
   <main class="main-content">
     
-    <!-- 標題區塊 (支援直接點擊修改並同步雲端) -->
+    <!-- 標題與宣佈區塊 -->
     <div class="page-header">
       <div class="title-wrapper">
         <h1 class="page-title" id="page-title" contenteditable="false" spellcheck="false">連線中...</h1>
@@ -244,10 +163,9 @@
       </div>
       <p class="page-subtitle" id="page-subtitle">今天是 <span class="date-highlight" id="today-date">載入中...</span>，歡迎收看 LTMPS 校園電視台直播，請耐心等候節目開始。</p>
       
-      <!-- ▼▼▼ 臨時宣佈區塊 ▼▼▼ -->
       <div class="announcement-wrapper" id="ann-wrapper">
         <span class="announcement-label">🚨 臨時宣佈：</span>
-        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">目前無特別宣佈事項</span>
+        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">連線中...</span>
         <button class="edit-btn small" id="edit-ann-btn" onclick="toggleEditAnnouncement()" title="修改臨時宣佈">✏️</button>
       </div>
     </div>
@@ -264,31 +182,25 @@
           <span id="live-text" class="status-title">讀取排程表...</span>
           <span id="auto-refresh-status" class="status-hint"></span>
         </div>
-
         <div class="bar-right">
           <button type="button" class="btn btn-fs" id="fs-btn" onclick="toggleFullScreen()" title="全螢幕切換">⛶ 全螢幕</button>
-          <button type="button" class="btn" id="auto-btn" onclick="toggleAutoRefresh()" title="開啟每 5 秒自動重整">⏱️️ 開始自動刷新</button>
-          <button type="button" class="btn btn-reload" onclick="manualReload()" title="手動立即刷新檢查">🔄 立即重試</button>
+          <button type="button" class="btn" id="auto-btn" onclick="toggleAutoRefresh()" title="開啟每 5 秒自動重整">⏱ 開始自動刷新</button>
+          <button type="button" class="btn btn-reload" onclick="manualReload()" title="手持立即刷新檢查">🔄 立即重試</button>
           <a id="yt-external-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-link">YouTube 觀看 ➔</a>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <!-- YouTube API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
-    // ==========================================
-    // 自動日期顯示
-    // ==========================================
+    // 自動日期
     function updateTodayDate() {
-      const now = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-      document.getElementById('today-date').innerText = now.toLocaleDateString('zh-TW', options);
+      document.getElementById('today-date').innerText = new Date().toLocaleDateString('zh-TW', options);
     }
     updateTodayDate();
 
@@ -309,85 +221,89 @@
 
     const titleEl = document.getElementById('page-title');
     const editTitleBtn = document.getElementById('edit-title-btn');
-    
     const annEl = document.getElementById('page-announcement');
     const annWrapper = document.getElementById('ann-wrapper');
     const editAnnBtn = document.getElementById('edit-ann-btn');
 
-    // 監聽雲端資料 (所有觀眾都會觸發，瞬間同步標題與宣佈)
+    // 監聽雲端資料
     db.collection("settings").doc("live").onSnapshot((doc) => {
       if (doc.exists) {
         const data = doc.data();
-        
-        // 更新標題 (如果當前沒在編輯狀態)
-        if (data.title && titleEl.contentEditable !== "true") {
-          titleEl.innerText = data.title;
-        }
-        
-        // 更新臨時宣佈 (如果當前沒在編輯狀態)
-        if (data.announcement !== undefined && annEl.contentEditable !== "true") {
-          annEl.innerText = data.announcement || "目前無特別宣佈事項";
-        }
-
+        if (data.title && titleEl.contentEditable !== "true") titleEl.innerText = data.title;
+        if (data.announcement !== undefined && annEl.contentEditable !== "true") annEl.innerText = data.announcement || "目前無特別宣佈事項";
       } else {
         if(titleEl.contentEditable !== "true") titleEl.innerText = "本日電視台直播";
         if(annEl.contentEditable !== "true") annEl.innerText = "目前無特別宣佈事項";
       }
     });
 
-    // 編輯【標題】邏輯
+    // 成功特效動畫函式
+    function showSuccessAnim(btnElement) {
+      btnElement.innerText = "✅";
+      btnElement.classList.add("success");
+      setTimeout(() => {
+        btnElement.innerText = "✏️";
+        btnElement.classList.remove("success");
+      }, 1500);
+    }
+
+    // 編輯【標題】
     function toggleEditTitle() {
-      const isEditing = titleEl.isContentEditable === "true";
-      
-      if (isEditing) {
+      // 修正判斷邏輯：確保取到字串 "true"
+      if (titleEl.contentEditable === "true") {
+        // 嘗試儲存
         titleEl.contentEditable = "false";
         titleEl.classList.remove('editing');
-        editTitleBtn.innerText = "✏️️";
-        editTitleBtn.title = "修改標題並同步";
+        editTitleBtn.innerText = "⏳";
         
         const newTitle = titleEl.innerText.trim() || "本日電視台直播";
-        db.collection("settings").doc("live").set({ title: newTitle }, { merge: true }).catch(e => console.error(e));
+        db.collection("settings").doc("live").set({ title: newTitle }, { merge: true })
+          .then(() => showSuccessAnim(editTitleBtn))
+          .catch(err => {
+            alert("❌ 儲存失敗！\n請確定 Firebase 的 Firestore Rules 已經設為: allow read, write: if true;");
+            console.error(err);
+            editTitleBtn.innerText = "✏️";
+          });
       } else {
+        // 進入編輯模式
         titleEl.contentEditable = "true";
         titleEl.classList.add('editing');
         titleEl.focus();
         editTitleBtn.innerText = "💾";
-        editTitleBtn.title = "儲存並同步至所有觀眾";
       }
     }
 
-    // 編輯【臨時宣佈】邏輯
+    // 編輯【臨時宣佈】
     function toggleEditAnnouncement() {
-      const isEditing = annEl.isContentEditable === "true";
-      
-      if (isEditing) {
+      // 修正判斷邏輯：確保取到字串 "true"
+      if (annEl.contentEditable === "true") {
+        // 嘗試儲存
         annEl.contentEditable = "false";
         annEl.classList.remove('editing');
         annWrapper.classList.remove('editing');
-        editAnnBtn.innerText = "✏️";
-        editAnnBtn.title = "修改臨時宣佈";
+        editAnnBtn.innerText = "⏳";
         
         const newAnn = annEl.innerText.trim();
-        db.collection("settings").doc("live").set({ announcement: newAnn }, { merge: true }).catch(e => console.error(e));
+        db.collection("settings").doc("live").set({ announcement: newAnn }, { merge: true })
+          .then(() => showSuccessAnim(editAnnBtn))
+          .catch(err => {
+            alert("❌ 儲存失敗！\n請確定 Firebase 的 Firestore Rules 已經設為: allow read, write: if true;");
+            console.error(err);
+            editAnnBtn.innerText = "✏️";
+          });
       } else {
+        // 進入編輯模式
         annEl.contentEditable = "true";
         annEl.classList.add('editing');
         annWrapper.classList.add('editing');
         annEl.focus();
         editAnnBtn.innerText = "💾";
-        editAnnBtn.title = "儲存並同步宣佈";
       }
     }
 
-    // 支援按下 Enter 鍵直接儲存 (標題)
-    titleEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); toggleEditTitle(); }
-    });
-    
-    // 支援按下 Enter 鍵直接儲存 (宣佈)
-    annEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); toggleEditAnnouncement(); }
-    });
+    // 支援 Enter 鍵儲存
+    titleEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); toggleEditTitle(); } });
+    annEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); toggleEditAnnouncement(); } });
 
 
     // ==========================================
@@ -396,71 +312,46 @@
     const SHEET_ID = '11PFRIwREa_PJBNog3kLyraoRrd6PRvgBqA8-ATmv5Pk'; 
     let VIDEO_ID = 'Cx3yJraVcnA'; 
 
-    let player = null;
-    let refreshTimer = null;
-    let countdown = 5;
-    let isLiveStarted = false;
-    let isAutoRefreshEnabled = false;
-    let isApiReady = false;
-    let isDataLoaded = false;
+    let player = null, refreshTimer = null, countdown = 5;
+    let isLiveStarted = false, isAutoRefreshEnabled = false, isApiReady = false, isDataLoaded = false;
 
     function extractVideoId(input) {
-      if (!input) return null;
-      const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/))([\w-]{11})/);
-      return (match && match[1]) ? match[1] : (input.trim().length === 11 ? input.trim() : null);
+      const match = input ? input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/))([\w-]{11})/) : null;
+      return match ? match[1] : (input && input.trim().length === 11 ? input.trim() : null);
     }
 
-    const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-    
-    fetch(sheetUrl)
-      .then(response => response.text())
+    fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`)
+      .then(r => r.text())
       .then(data => {
         if (data) {
           const lines = data.split(/\r?\n/);
-          const today = new Date();
-          const tYear = today.getFullYear();
-          const tMonth = today.getMonth() + 1;
-          const tDate = today.getDate();
-
-          let foundTodayId = null;
-          let latestPastId = null; 
-          let firstAvailableId = null; 
+          const today = new Date(), tYear = today.getFullYear(), tMonth = today.getMonth() + 1, tDate = today.getDate();
+          let foundTodayId = null, latestPastId = null, firstAvailableId = null; 
 
           for (let i = 0; i < lines.length; i++) {
             const cols = lines[i].split(',');
             if (cols.length >= 2) {
-              const dateStr = cols[0].replace(/['"]/g, '').trim(); 
-              const urlStr = cols[1].replace(/['"]/g, '').trim();  
-              
-              const rowDate = new Date(dateStr);
-              if (!isNaN(rowDate.getTime())) {
-                const rYear = rowDate.getFullYear();
-                const rMonth = rowDate.getMonth() + 1;
-                const rDate = rowDate.getDate();
-
-                const extId = extractVideoId(urlStr);
-                if (extId) {
-                   if (!firstAvailableId) firstAvailableId = extId;
-                   if (rYear === tYear && rMonth === tMonth && rDate === tDate) { foundTodayId = extId; break; }
-                   if (rowDate <= today) { latestPastId = extId; }
-                }
+              const rowDate = new Date(cols[0].replace(/['"]/g, '').trim());
+              const extId = extractVideoId(cols[1].replace(/['"]/g, '').trim());
+              if (!isNaN(rowDate.getTime()) && extId) {
+                 if (!firstAvailableId) firstAvailableId = extId;
+                 if (rowDate.getFullYear() === tYear && rowDate.getMonth() + 1 === tMonth && rowDate.getDate() === tDate) { foundTodayId = extId; break; }
+                 if (rowDate <= today) { latestPastId = extId; }
               }
             }
           }
-          
           if (foundTodayId) VIDEO_ID = foundTodayId; 
           else if (latestPastId) VIDEO_ID = latestPastId; 
           else if (firstAvailableId) VIDEO_ID = firstAvailableId; 
         }
         finishDataLoad();
-      }).catch(err => { finishDataLoad(); });
+      }).catch(() => finishDataLoad());
 
     function finishDataLoad() {
       isDataLoaded = true;
       document.getElementById('yt-external-link').href = `https://www.youtube.com/watch?v=${VIDEO_ID}`;
       document.getElementById('live-text').innerText = '準備就緒，等待開播';
-      updateStatusText();
-      initPlayer();
+      updateStatusText(); initPlayer();
     }
 
     function onYouTubeIframeAPIReady() { isApiReady = true; initPlayer(); }
@@ -471,8 +362,7 @@
 
       document.getElementById('video-wrapper').innerHTML = '<div id="player-slot"></div>';
       player = new YT.Player('player-slot', {
-        videoId: VIDEO_ID,
-        playerVars: { 'autoplay': 1, 'mute': 1, 'rel': 0, 'playsinline': 1, 'fs': 1 },
+        videoId: VIDEO_ID, playerVars: { 'autoplay': 1, 'mute': 1, 'rel': 0, 'playsinline': 1, 'fs': 1 },
         events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
       });
     }
@@ -497,14 +387,11 @@
     function handleLiveStarted() {
       if (isLiveStarted) return;
       isLiveStarted = true; stopCountdown();
-      
       const container = document.getElementById('player-container');
       if (container) container.classList.add('is-live');
-
       document.getElementById('live-dot').className = 'dot live';
       document.getElementById('live-text').innerText = '🔴 直播進行中';
       document.getElementById('auto-refresh-status').innerText = '（已連線，請點擊畫面取消靜音）';
-      
       const autoBtn = document.getElementById('auto-btn');
       if (autoBtn) autoBtn.style.display = 'none';
     }
@@ -513,12 +400,8 @@
       if (isLiveStarted) return;
       isAutoRefreshEnabled = !isAutoRefreshEnabled;
       const btn = document.getElementById('auto-btn');
-      
-      if (isAutoRefreshEnabled) {
-        btn.innerText = '⏹ 停止自動刷新'; btn.classList.add('active-refresh'); startCountdown();
-      } else {
-        btn.innerText = '⏱️ 開始自動刷新'; btn.classList.remove('active-refresh'); stopCountdown();
-      }
+      if (isAutoRefreshEnabled) { btn.innerText = '⏹ 停止自動刷新'; btn.classList.add('active-refresh'); startCountdown(); } 
+      else { btn.innerText = '⏱️ 開始自動刷新'; btn.classList.remove('active-refresh'); stopCountdown(); }
     }
 
     function startCountdown() {
@@ -535,49 +418,26 @@
     function stopCountdown() { if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; } updateStatusText(); }
     function updateStatusText() {
       const statusElem = document.getElementById('auto-refresh-status');
-      if (statusElem && !isLiveStarted) {
-        statusElem.innerText = isAutoRefreshEnabled ? `（將在 ${countdown}s 後刷新檢查）` : `（自動刷新已關閉）`;
-      }
+      if (statusElem && !isLiveStarted) statusElem.innerText = isAutoRefreshEnabled ? `（將在 ${countdown}s 後刷新檢查）` : `（自動刷新已關閉）`;
     }
-
     function manualReload() { if (isLiveStarted) return; countdown = 5; updateStatusText(); initPlayer(); }
 
     function toggleFullScreen() {
-      const fsBtn = document.getElementById('fs-btn');
-      const container = document.getElementById('player-container');
-      const wrapper = document.getElementById('video-wrapper');
-      const iframe = player && player.getIframe ? player.getIframe() : null;
-
-      if (container.classList.contains('fake-fullscreen')) {
-        container.classList.remove('fake-fullscreen');
-        if (fsBtn) fsBtn.innerText = '⛶ 全螢幕';
-        return;
-      }
-
+      const fsBtn = document.getElementById('fs-btn'), container = document.getElementById('player-container'), wrapper = document.getElementById('video-wrapper'), iframe = player && player.getIframe ? player.getIframe() : null;
+      if (container.classList.contains('fake-fullscreen')) { container.classList.remove('fake-fullscreen'); if (fsBtn) fsBtn.innerText = '⛶ 全螢幕'; return; }
       const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-
       if (isFullscreen) {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
+        if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); else if (document.mozCancelFullScreen) document.mozCancelFullScreen(); else if (document.msExitFullscreen) document.msExitFullscreen();
       } else {
         let target = iframe || wrapper;
         let req = target.requestFullscreen || target.webkitRequestFullscreen || target.mozRequestFullScreen || target.msRequestFullscreen;
-
-        if (req) {
-          try { let p = req.call(target); if (p && p.catch) { p.catch(err => { enterFakeFullscreen(); }); } } catch(e) { enterFakeFullscreen(); }
-        } else { enterFakeFullscreen(); }
+        if (req) { try { let p = req.call(target); if (p && p.catch) { p.catch(err => { enterFakeFullscreen(); }); } } catch(e) { enterFakeFullscreen(); } } else { enterFakeFullscreen(); }
       }
     }
-
     function enterFakeFullscreen() {
-      const container = document.getElementById('player-container');
-      const fsBtn = document.getElementById('fs-btn');
-      container.classList.add('fake-fullscreen');
-      if (fsBtn) fsBtn.innerText = '🗗 縮小';
+      const container = document.getElementById('player-container'), fsBtn = document.getElementById('fs-btn');
+      container.classList.add('fake-fullscreen'); if (fsBtn) fsBtn.innerText = '🗗 縮小';
     }
-
     ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
       document.addEventListener(evt, () => {
         const fsBtn = document.getElementById('fs-btn');
@@ -585,15 +445,10 @@
         if (fsBtn) fsBtn.innerText = isFullscreen ? '🗗 縮小' : '⛶ 全螢幕';
       });
     });
-
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        const container = document.getElementById('player-container');
-        const fsBtn = document.getElementById('fs-btn');
-        if (container.classList.contains('fake-fullscreen')) {
-          container.classList.remove('fake-fullscreen');
-          if (fsBtn) fsBtn.innerText = '⛶ 全螢幕';
-        }
+        const container = document.getElementById('player-container'), fsBtn = document.getElementById('fs-btn');
+        if (container.classList.contains('fake-fullscreen')) { container.classList.remove('fake-fullscreen'); if (fsBtn) fsBtn.innerText = '⛶ 全螢幕'; }
       }
     });
   </script>
