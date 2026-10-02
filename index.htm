@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本日電視台直播 - LTMPS Campus TV</title>
+  <style>
+    /* ==========================================
+       全域與沉浸式深色背景 (Cinematic Dark Theme)
+       ========================================== */
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #05050a;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .bg-glow {
+      position: fixed;
+      top: -20%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(26,115,232,0.15) 0%, rgba(0,0,0,0) 70%);
+      border-radius: 50%;
+      z-index: -1;
+      animation: float-slow 10s infinite alternate ease-in-out;
+    }
+    .bg-glow.right {
+      top: 40%;
+      left: auto;
+      right: -10%;
+      background: radial-gradient(circle, rgba(233,64,87,0.1) 0%, rgba(0,0,0,0) 70%);
+      animation-delay: -5s;
+    }
+
+    @keyframes float-slow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, 50px) scale(1.1); }
+    }
+
+    /* 頂部導航列 */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 30px;
+      background: rgba(15, 15, 20, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* 已將 <a> 改為 <div>，取消超連結效果，保留樣式 */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      cursor: default; /* 取消手指游標 */
+    }
+
+    .nav-brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+      box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-link.active {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .main-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 50px 24px 80px;
+    }
+
+    /* 標題區塊 */
+    .page-header {
+      text-align: center;
+      margin-bottom: 45px;
+    }
+
+    .page-title {
+      font-size: 42px;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+      background: linear-gradient(to right, #fff, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: #9aa0a6;
+      margin: 0;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    /* 播放器與 UI 介面 */
+    .live-player-container {
+      width: 100%;
+      background-color: #0b0b0e;
+      border-radius: 16px; 
+      overflow: hidden; 
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .live-player-container.is-live {
+      border-color: rgba(255, 51, 51, 0.5);
+      box-shadow: 0 0 40px rgba(255, 51, 51, 0.3), 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .live-player-container.fake-fullscreen {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      z-index: 2147483647 !important;
+      border-radius: 0 !important;
+      border: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: #000 !important;
+    }
+
+    .live-player-container.fake-fullscreen .video-wrapper {
+      flex: 1 1 auto !important;
+      aspect-ratio: auto !important;
+      height: 100% !important;
+    }
+
+    .video-wrapper {
+      position: relative; 
+      width: 100%; 
+      aspect-ratio: 16 / 9; 
+      background-color: #000;
+    }
+    
+    .video-wrapper iframe, .video-wrapper #player-slot {
+      width: 100%; 
+      height: 100%; 
+      display: block; 
+      border: 0;
+    }
+
+    #video-wrapper:fullscreen, #video-wrapper:-webkit-full-screen, #video-wrapper:-moz-full-screen {
+      width: 100vw !important; height: 100vh !important;
+      background-color: #000; display: flex; align-items: center; justify-content: center;
+    }
+
+    .live-custom-bar {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+      gap: 12px; padding: 16px 20px; 
+      background: rgba(20, 20, 25, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px; color: #fff;
+    }
+    
+    .bar-left, .bar-right { display: flex; align-items: center; gap: 12px; }
+
+    .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+    .dot.waiting {
+      background: linear-gradient(45deg, #f6d365 0%, #fda085 100%);
+      animation: pulse-colorful 2s infinite;
+    }
+    .dot.live {
+      background: #ff3333; box-shadow: 0 0 16px #ff3333, 0 0 32px #ff3333;
+      animation: pulse-live 1s infinite alternate;
+    }
+
+    @keyframes pulse-colorful {
+      0% { transform: scale(0.9); box-shadow: 0 0 10px rgba(253,160,133, 0.6); }
+      50% { transform: scale(1.15); box-shadow: 0 0 20px rgba(246,211,101, 0.8); }
+      100% { transform: scale(0.9); box-shadow: 0 0 10px rgba(253,160,133, 0.6); }
+    }
+    @keyframes pulse-live {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .status-title { font-weight: 700; letter-spacing: 1px; }
+    .status-hint { color: #a1a1b5; font-size: 12px; }
+
+    .btn {
+      color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px;
+      padding: 8px 16px; cursor: pointer; font-size: 12px; font-weight: 600; 
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    #auto-btn { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-color: #3b6bbf; }
+    #auto-btn.active-refresh { background: linear-gradient(135deg, #d35400 0%, #e67e22 100%); border-color: #f39c12; }
+    .btn-reload { background: linear-gradient(135deg, #4b515d 0%, #343a40 100%); }
+    .btn-fs { background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%); border-color: #635694; }
+
+    .btn:hover {
+      transform: translateY(-3px); filter: brightness(1.15);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); border-color: rgba(255, 255, 255, 0.4);
+    }
+    .btn:active { transform: translateY(0); }
+
+    .btn-link {
+      background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-decoration: none; font-size: 13px; font-weight: 700; padding: 6px 8px;
+      transition: all 0.3s ease;
+    }
+    .btn-link:hover { filter: brightness(1.2) drop-shadow(0 0 10px rgba(79, 172, 254, 0.5)); }
+  </style>
+</head>
+<body>
+
+  <!-- 背景動態光影 -->
+  <div class="bg-glow"></div>
+  <div class="bg-glow right"></div>
+
+  <!-- 頂部導航列 (已取消超連結) -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="nav-brand-icon">TV</div>
+      LTMPS Campus TV
+    </div>
+    <nav class="nav-links">
+      <span class="nav-link active">本日電視台直播</span>
+    </nav>
+  </header>
+
+  <!-- 網頁主要內容區塊 -->
+  <main class="main-content">
+    
+    <!-- 標題區塊 (加上 ID 以便 Firebase 控制) -->
+    <div class="page-header">
+      <h1 class="page-title" id="page-title">本日電視台直播</h1>
+      <p class="page-subtitle" id="page-subtitle">歡迎收看 LTMPS 校園電視台直播，請耐心等候節目開始。</p>
+    </div>
+
+    <!-- 播放器區塊 -->
+    <div class="live-player-container" id="player-container">
+      <div class="video-wrapper" id="video-wrapper">
+        <div id="player-slot"></div>
+      </div>
+
+      <div class="live-custom-bar">
+        <div class="bar-left">
+          <span id="live-dot" class="dot waiting"></span>
+          <span id="live-text" class="status-title">讀取排程表...</span>
+          <span id="auto-refresh-status" class="status-hint"></span>
+        </div>
+
+        <div class="bar-right">
+          <button type="button" class="btn btn-fs" id="fs-btn" onclick="toggleFullScreen()" title="全螢幕切換">⛶ 全螢幕</button>
+          <button type="button" class="btn" id="auto-btn" onclick="toggleAutoRefresh()" title="開啟每 5 秒自動重整">⏱️ 開始自動刷新</button>
+          <button type="button" class="btn btn-reload" onclick="manualReload()" title="手動立即刷新檢查">🔄 立即重試</button>
+          <a id="yt-external-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-link">前往 YouTube 觀看 ➔</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 引入 Firebase SDK (相容舊版寫法，方便單一檔案執行) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <!-- 引入 YouTube API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    // ==========================================
+    // 1. Firebase 標題即時更新系統
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyBr0-oNmRN859g6bfGDVjSdA1brJC8CxNs",
+      authDomain: "ltmps-c92a0.firebaseapp.com",
+      projectId: "ltmps-c92a0",
+      storageBucket: "ltmps-c92a0.firebasestorage.app",
+      messagingSenderId: "716255242034",
+      appId: "1:716255242034:web:b25a037869d8a9de6f992b"
+    };
+    
+    // 初始化 Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 監聽 Firestore 資料庫 (集合: settings, 文件: live)
+    db.collection("settings").doc("live").onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.title) document.getElementById('page-title').innerText = data.title;
+        if (data.subtitle) document.getElementById('page-subtitle').innerText = data.subtitle;
+      }
+    });
+
+
+    // ==========================================
+    // 2. 試算表影片排程與播放器系統
+    // ==========================================
+    const SHEET_ID = '11PFRIwREa_PJBNog3kLyraoRrd6PRvgBqA8-ATmv5Pk'; 
+    let VIDEO_ID = 'Cx3yJraVcnA'; // 最終安全備用 ID
+
+    let player = null;
+    let refreshTimer = null;
+    let countdown = 5;
+    let isLiveStarted = false;
+    let isAutoRefreshEnabled = false;
+    let isApiReady = false;
+    let isDataLoaded = false;
+
+    function extractVideoId(input) {
+      if (!input) return null;
+      const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/))([\w-]{11})/);
+      return (match && match[1]) ? match[1] : (input.trim().length === 11 ? input.trim() : null);
+    }
+
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+    
+    fetch(sheetUrl)
+      .then(response => response.text())
+      .then(data => {
+        if (data) {
+          const lines = data.split(/\r?\n/);
+          const today = new Date();
+          const tYear = today.getFullYear();
+          const tMonth = today.getMonth() + 1;
+          const tDate = today.getDate();
+
+          let foundTodayId = null;
+          let latestPastId = null; 
+          let firstAvailableId = null; 
+
+          for (let i = 0; i < lines.length; i++) {
+            const cols = lines[i].split(',');
+            if (cols.length >= 2) {
+              const dateStr = cols[0].replace(/['"]/g, '').trim(); 
+              const urlStr = cols[1].replace(/['"]/g, '').trim();  
+              
+              const rowDate = new Date(dateStr);
+              if (!isNaN(rowDate.getTime())) {
+                const rYear = rowDate.getFullYear();
+                const rMonth = rowDate.getMonth() + 1;
+                const rDate = rowDate.getDate();
+
+                const extId = extractVideoId(urlStr);
+                if (extId) {
+                   if (!firstAvailableId) firstAvailableId = extId;
+
+                   if (rYear === tYear && rMonth === tMonth && rDate === tDate) {
+                     foundTodayId = extId;
+                     break; 
+                   }
+                   if (rowDate <= today) {
+                     latestPastId = extId; 
+                   }
+                }
+              }
+            }
+          }
+          
+          if (foundTodayId) {
+            VIDEO_ID = foundTodayId; 
+          } else if (latestPastId) {
+            VIDEO_ID = latestPastId; 
+          } else if (firstAvailableId) {
+            VIDEO_ID = firstAvailableId; 
+          }
+        }
+        finishDataLoad();
+      })
+      .catch(err => {
+        console.warn("無法讀取試算表", err);
+        finishDataLoad();
+      });
+
+    function finishDataLoad() {
+      isDataLoaded = true;
+      document.getElementById('yt-external-link').href = `https://www.youtube.com/watch?v=${VIDEO_ID}`;
+      document.getElementById('live-text').innerText = '準備就緒，等待開播';
+      updateStatusText();
+      initPlayer();
+    }
+
+    function onYouTubeIframeAPIReady() {
+      isApiReady = true;
+      initPlayer();
+    }
+
+    function initPlayer() {
+      if (!isApiReady || !isDataLoaded) return;
+
+      if (player && typeof player.destroy === 'function') {
+        try { player.destroy(); } catch(e) {}
+        player = null;
+      }
+
+      const wrapper = document.getElementById('video-wrapper');
+      wrapper.innerHTML = '<div id="player-slot"></div>';
+
+      player = new YT.Player('player-slot', {
+        videoId: VIDEO_ID,
+        playerVars: { 'autoplay': 1, 'mute': 1, 'rel': 0, 'playsinline': 1, 'fs': 1 },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      const iframe = player.getIframe();
+      if (iframe) {
+        iframe.setAttribute('allowfullscreen', 'true');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen');
+      }
+      
+      event.target.mute();
+      event.target.playVideo();
+      
+      if (isAutoRefreshEnabled && !isLiveStarted) {
+        startCountdown();
+      }
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.BUFFERING) {
+        if (player && typeof player.getCurrentTime === 'function' && player.getCurrentTime() > 0) {
+          handleLiveStarted();
+        } else if (event.data === YT.PlayerState.PLAYING) {
+          handleLiveStarted();
+        }
+      }
+    }
+
+    function handleLiveStarted() {
+      if (isLiveStarted) return;
+      isLiveStarted = true;
+      
+      stopCountdown();
+      
+      const container = document.getElementById('player-container');
+      if (container) container.classList.add('is-live');
+
+      document.getElementById('live-dot').className = 'dot live';
+      document.getElementById('live-text').innerText = '🔴 直播進行中';
+      document.getElementById('auto-refresh-status').innerText = '（已連線，請點擊畫面取消靜音）';
+      
+      const autoBtn = document.getElementById('auto-btn');
+      if (autoBtn) autoBtn.style.display = 'none';
+    }
+
+    function toggleAutoRefresh() {
+      if (isLiveStarted) return;
+      
+      isAutoRefreshEnabled = !isAutoRefreshEnabled;
+      const btn = document.getElementById('auto-btn');
+      
+      if (isAutoRefreshEnabled) {
+        btn.innerText = '⏹ 停止自動刷新';
+        btn.classList.add('active-refresh');
+        startCountdown();
+      } else {
+        btn.innerText = '⏱️ 開始自動刷新';
+        btn.classList.remove('active-refresh');
+        stopCountdown();
+      }
+    }
+
+    function startCountdown() {
+      if (isLiveStarted) return;
+      countdown = 5;
+      updateStatusText();
+
+      if (!refreshTimer) {
+        refreshTimer = setInterval(() => {
+          countdown--;
+          updateStatusText();
+          if (countdown <= 0) {
+            countdown = 5;
+            if (!isLiveStarted) {
+              initPlayer();
+            }
+          }
+        }, 1000);
+      }
+    }
+
+    function stopCountdown() {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+      updateStatusText();
+    }
+
+    function updateStatusText() {
+      const statusElem = document.getElementById('auto-refresh-status');
+      if (statusElem && !isLiveStarted) {
+        if (isAutoRefreshEnabled) {
+          statusElem.innerText = `（將在 ${countdown}s 後刷新檢查）`;
+        } else {
+          statusElem.innerText = `（自動刷新已關閉）`;
+        }
+      }
+    }
+
+    function manualReload() {
+      if (isLiveStarted) return;
+      countdown = 5;
+      updateStatusText();
+      initPlayer();
+    }
+
+    function toggleFullScreen() {
+      const fsBtn = document.getElementById('fs-btn');
+      const container = document.getElementById('player-container');
+      const wrapper = document.getElementById('video-wrapper');
+      const iframe = player && player.getIframe ? player.getIframe() : null;
+
+      if (container.classList.contains('fake-fullscreen')) {
+        container.classList.remove('fake-fullscreen');
+        if (fsBtn) fsBtn.innerText = '⛶ 全螢幕';
+        return;
+      }
+
+      const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+      if (isFullscreen) {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      } else {
+        let target = iframe || wrapper;
+        let req = target.requestFullscreen || target.webkitRequestFullscreen || target.mozRequestFullScreen || target.msRequestFullscreen;
+
+        if (req) {
+          try {
+            let p = req.call(target);
+            if (p && p.catch) {
+              p.catch(err => { enterFakeFullscreen(); });
+            }
+          } catch(e) { enterFakeFullscreen(); }
+        } else {
+          enterFakeFullscreen();
+        }
+      }
+    }
+
+    function enterFakeFullscreen() {
+      const container = document.getElementById('player-container');
+      const fsBtn = document.getElementById('fs-btn');
+      container.classList.add('fake-fullscreen');
+      if (fsBtn) fsBtn.innerText = '🗗 縮小';
+    }
+
+    ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+      document.addEventListener(evt, () => {
+        const fsBtn = document.getElementById('fs-btn');
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        if (fsBtn) fsBtn.innerText = isFullscreen ? '🗗 縮小' : '⛶ 全螢幕';
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const container = document.getElementById('player-container');
+        const fsBtn = document.getElementById('fs-btn');
+        if (container.classList.contains('fake-fullscreen')) {
+          container.classList.remove('fake-fullscreen');
+          if (fsBtn) fsBtn.innerText = '⛶ 全螢幕';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
