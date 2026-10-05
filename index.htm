@@ -57,7 +57,7 @@
     .main-content { max-width: 1150px; margin: 0 auto; padding: 40px 24px 80px; }
 
     /* ==========================================
-       動態漸層標題與宣布區塊
+       動態漸層標題與宣佈區塊
        ========================================== */
     .page-header { text-align: center; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; }
     .title-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
@@ -70,12 +70,18 @@
     }
     @keyframes gradient-text { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-    /* 副標題與下期預告整合區塊 */
+    /* 副標題、Day標籤 與 下期預告整合區塊 */
     .subtitle-wrapper {
       font-size: 16px; color: #b5b5c3; margin: 0; font-weight: 500; letter-spacing: 0.5px;
       display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; line-height: 1.6;
     }
     .date-highlight { color: #00f2fe; font-weight: 700; text-shadow: 0 0 8px rgba(0, 242, 254, 0.4); }
+
+    .day-badge {
+      background: rgba(0, 242, 254, 0.15); color: #00f2fe; padding: 2px 8px; border-radius: 6px;
+      font-weight: 800; font-size: 13px; margin-left: 6px; border: 1px solid rgba(0, 242, 254, 0.3);
+      display: inline-flex; align-items: center; vertical-align: text-bottom;
+    }
 
     .upcoming-box {
       background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15);
@@ -84,7 +90,7 @@
     .upcoming-label { background: #4facfe; color: #000; padding: 2px 8px; border-radius: 12px; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; }
     .upcoming-text { font-weight: 600; color: #e2e2e2; }
 
-    /* 臨時宣布橫幅 */
+    /* 臨時宣佈橫幅 */
     .announcement-wrapper {
       display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 8px 16px 8px 20px;
       background: linear-gradient(90deg, rgba(255, 36, 66, 0.15) 0%, rgba(255, 36, 66, 0.05) 100%);
@@ -154,18 +160,12 @@
     .attendance-title { font-size: 18px; font-weight: 800; margin: 0 0 20px 0; color: #fff; display: flex; align-items: center; gap: 10px; }
     .attendance-title::before { content: ''; display: block; width: 4px; height: 18px; background: #00f2fe; border-radius: 2px; }
     
-    .attendance-grid {
-      display: grid; 
-      /* 固定 10 欄排版，讓 1A~2E、3A~4E、5A~6E 自然形成三排，間距緊湊 */
-      grid-template-columns: repeat(10, 1fr); 
-      gap: 10px;
-    }
+    .attendance-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; }
     
     .class-card {
       background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px; padding: 10px 0; text-align: center; font-size: 15px; font-weight: 700;
-      color: #5f6368; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative; overflow: hidden;
+      color: #5f6368; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
     }
     
     .class-card.online {
@@ -178,10 +178,7 @@
     }
     @keyframes pulse-online { 0% { opacity: 0.5; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
 
-    /* 手機版響應式自動折排 */
-    @media (max-width: 768px) { 
-      .attendance-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    }
+    @media (max-width: 768px) { .attendance-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; } }
 
   </style>
 </head>
@@ -206,20 +203,24 @@
     <div class="page-header">
       <div class="title-wrapper"><h1 class="page-title" id="page-title">載入排程中...</h1></div>
       
-      <!-- 整合的副標題區塊：包含日期與下期預告 -->
+      <!-- 整合的副標題區塊：包含日期、Day 與下期預告 -->
       <div class="subtitle-wrapper">
-        <span>今天是 <span class="date-highlight" id="today-date">載入中...</span>，歡迎收看 LTMPS 校園電視台。</span>
+        <span>
+          今天是 <span class="date-highlight" id="today-date">載入中...</span>
+          <!-- 動態顯示的 Day 標籤 -->
+          <span class="day-badge" id="today-cycle" style="display: none;"></span>，歡迎收看 LTMPS 校園電視台。
+        </span>
         <div class="upcoming-box" id="upcoming-wrapper" style="display: none;">
           <span class="upcoming-label">下期節目</span>
           <span class="upcoming-text" id="upcoming-text">載入中...</span>
         </div>
       </div>
       
-      <!-- 臨時宣布 -->
+      <!-- 臨時宣佈 -->
       <div class="announcement-wrapper" id="ann-wrapper">
-        <span class="announcement-label">🚨 臨時宣布：</span>
-        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">目前無特別宣布事項</span>
-        <button class="edit-btn small" id="edit-ann-btn" onclick="toggleEditAnnouncement()" title="修改臨時宣布並同步全校">✏️</button>
+        <span class="announcement-label">🚨 臨時宣佈：</span>
+        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">目前無特別宣佈事項</span>
+        <button class="edit-btn small" id="edit-ann-btn" onclick="toggleEditAnnouncement()" title="修改臨時宣佈並同步全校">✏️</button>
       </div>
     </div>
 
@@ -245,7 +246,7 @@
       </div>
     </div>
 
-    <!-- 各班收看燈號看板 (單一緊湊網格) -->
+    <!-- 各班收看燈號看板 -->
     <div class="attendance-board">
       <h3 class="attendance-title">📡 全校課室連線狀態</h3>
       <div class="attendance-grid" id="attendance-grid">
@@ -275,16 +276,13 @@
     const gridEl = document.getElementById('attendance-grid');
 
     classList.forEach(cls => {
-      // 下拉選單選項
       let opt = document.createElement('option'); opt.value = cls; opt.innerText = cls + ' 班'; selectEl.appendChild(opt);
-      
-      // 班級卡片 (直接全塞進 grid)
       let card = document.createElement('div'); card.className = 'class-card'; card.id = 'card-' + cls; card.innerText = cls; 
       gridEl.appendChild(card);
     });
 
     // ==========================================
-    // 日期、試算表排程
+    // 日期、試算表排程 (強化的 CSV 解析器支援 D 欄)
     // ==========================================
     function getTodayString() {
       const now = new Date();
@@ -308,6 +306,19 @@
       return match ? match[1] : (input && input.trim().length === 11 ? input.trim() : null);
     }
 
+    // 智能 CSV 解析器 (能夠正確拆分包含逗號的引號內容，精準抓出 D 欄)
+    function parseCsvLine(text) {
+      let ret = [], val = "", inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        let c = text[i];
+        if (c === '"') { inQuotes = !inQuotes; }
+        else if (c === ',' && !inQuotes) { ret.push(val.trim()); val = ""; }
+        else { val += c; }
+      }
+      ret.push(val.trim());
+      return ret.map(v => v.replace(/^"|"$/g, '').trim());
+    }
+
     fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`)
       .then(r => r.text())
       .then(data => {
@@ -316,24 +327,45 @@
           const today = new Date(); today.setHours(0,0,0,0);
           const tYear = today.getFullYear(), tMonth = today.getMonth() + 1, tDate = today.getDate();
 
-          let foundTodayId = null, foundTodayTitle = null, latestPastId = null, latestPastTitle = null; 
+          let foundTodayId = null, foundTodayTitle = null, foundTodayCycle = "";
+          let latestPastId = null, latestPastTitle = null; 
           let futureEvents = [];
 
           for (let i = 0; i < lines.length; i++) {
-            const cols = lines[i].split(',');
-            if (cols.length >= 2) {
-              const rowDate = new Date(cols[0].replace(/['"]/g, '').trim());
-              const extId = extractVideoId(cols[1].replace(/['"]/g, '').trim());
-              let titleStr = cols.length >= 3 ? cols.slice(2).join(',').replace(/^['"]|['"]$/g, '').trim() : "";
+            if (!lines[i].trim()) continue;
+            const cols = parseCsvLine(lines[i]);
+            
+            if (cols.length >= 1) {
+              const rowDate = new Date(cols[0]);
               
-              if (!isNaN(rowDate.getTime()) && extId) {
-                 if (rowDate.getFullYear() === tYear && rowDate.getMonth() + 1 === tMonth && rowDate.getDate() === tDate) { foundTodayId = extId; foundTodayTitle = titleStr; } 
-                 else if (rowDate < today) { latestPastId = extId; latestPastTitle = titleStr; }
-                 else if (rowDate > today) { futureEvents.push({ date: rowDate, title: titleStr, id: extId }); }
+              if (!isNaN(rowDate.getTime())) {
+                 const rYear = rowDate.getFullYear(), rMonth = rowDate.getMonth() + 1, rDate = rowDate.getDate();
+                 
+                 // 1. 抓取當日 Day 資訊 (D欄)
+                 if (rYear === tYear && rMonth === tMonth && rDate === tDate) {
+                   if (cols.length >= 4 && cols[3]) {
+                     foundTodayCycle = cols[3];
+                   }
+                 }
+
+                 // 2. 抓取影片網址與標題
+                 const extId = cols.length >= 2 ? extractVideoId(cols[1]) : null;
+                 let titleStr = cols.length >= 3 ? cols[2] : "";
+
+                 if (extId) {
+                   if (rYear === tYear && rMonth === tMonth && rDate === tDate) { 
+                     foundTodayId = extId; foundTodayTitle = titleStr; 
+                   } 
+                   else if (rowDate < today) { latestPastId = extId; latestPastTitle = titleStr; }
+                   else if (rowDate > today) { futureEvents.push({ date: rowDate, title: titleStr, id: extId }); }
+                 }
               }
             }
           }
           
+          // ===============================
+          // 更新標題
+          // ===============================
           let finalTitlePrefix = "本日電視台節目";
           let finalTitleName = "";
 
@@ -354,6 +386,23 @@
 
           document.getElementById('page-title').innerText = finalTitleName ? `${finalTitlePrefix}：${finalTitleName}` : finalTitlePrefix;
 
+          // ===============================
+          // 更新 Day (D 欄)
+          // ===============================
+          if (foundTodayCycle) {
+            let cycleText = foundTodayCycle;
+            // 如果輸入單一字母 (如 A)，自動加上 Day
+            if (cycleText.length === 1 && /[a-zA-Z]/.test(cycleText)) {
+              cycleText = "Day " + cycleText.toUpperCase();
+            }
+            const cycleEl = document.getElementById('today-cycle');
+            cycleEl.innerText = cycleText;
+            cycleEl.style.display = 'inline-flex';
+          }
+
+          // ===============================
+          // 更新下期預告
+          // ===============================
           if (futureEvents.length > 0) {
             futureEvents.sort((a, b) => a.date - b.date);
             const nextEvent = futureEvents[0];
@@ -466,7 +515,7 @@
   </script>
 
   <!-- ==========================================
-       Firebase 宣布(含午夜自動重置)與點名系統
+       Firebase 宣佈(含午夜自動重置)與點名系統
        ========================================== -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -487,29 +536,25 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
 
-      // 宣布系統與午夜自動重置機制
+      // 宣佈系統與午夜自動重置機制
       const annEl = document.getElementById('page-announcement');
       const annWrapper = document.getElementById('ann-wrapper');
       const editAnnBtn = document.getElementById('edit-ann-btn');
       
-      const defaultAnnText = "目前無特別宣布事項";
+      const defaultAnnText = "目前無特別宣佈事項";
 
       db.ref('settings/announcement').on('value', (snapshot) => {
         const data = snapshot.val();
         
         if (data && typeof data === 'object') {
-          // 如果宣布是有日期的物件，檢查日期是否過期
           const todayStr = getTodayString();
           if (data.date !== todayStr) {
-            // 已過期：在本地顯示預設文字，並寫回 Firebase 進行重置
             if (annEl.contentEditable !== "true") annEl.innerText = defaultAnnText;
             db.ref('settings/announcement').set({ text: defaultAnnText, date: todayStr });
           } else {
-            // 當日有效宣布
             if (annEl.contentEditable !== "true") annEl.innerText = data.text || defaultAnnText;
           }
         } else if (data && typeof data === 'string') {
-          // 為了相容舊資料結構，強制覆寫為帶日期的結構
           const todayStr = getTodayString();
           if (annEl.contentEditable !== "true") annEl.innerText = data;
           db.ref('settings/announcement').set({ text: data, date: todayStr });
@@ -530,7 +575,6 @@
           const newAnn = annEl.innerText.trim();
           const todayStr = getTodayString();
           
-          // 儲存文字與儲存當下的日期
           db.ref('settings/announcement').set({ text: newAnn, date: todayStr })
             .then(() => showSuccessAnim(editAnnBtn))
             .catch(err => { alert("❌ 儲存失敗！請確認 Firebase 權限已開放。"); editAnnBtn.innerText = "✏️"; });
