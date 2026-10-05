@@ -97,6 +97,7 @@
     
     .edit-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; border-radius: 50%; width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.3s ease; }
     .edit-btn:hover { background: #00f2fe; border-color: #00f2fe; transform: scale(1.15); }
+    .edit-btn.success { background: #38ef7d; border-color: #38ef7d; box-shadow: 0 0 20px rgba(56, 239, 125, 0.8); transform: scale(1.1); }
 
     @media (max-width: 768px) { 
       .announcement-wrapper { flex-direction: column; align-items: center; text-align: center; border-left: none; border-top: 4px solid #ff2442; } 
@@ -143,19 +144,25 @@
     .btn:hover { transform: translateY(-3px); filter: brightness(1.2); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); border-color: #fff; }
 
     /* ==========================================
-       各班級收看燈號區塊
+       各班級收看燈號區塊 (單一緊湊網格)
        ========================================== */
     .attendance-board {
       margin-top: 40px; padding: 25px;
-      background: rgba(15, 15, 25, 0.6); border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .attendance-title { font-size: 18px; font-weight: 800; margin: 0 0 20px 0; color: #fff; display: flex; align-items: center; gap: 10px; }
     .attendance-title::before { content: ''; display: block; width: 4px; height: 18px; background: #00f2fe; border-radius: 2px; }
     
-    .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 12px; }
+    .attendance-grid {
+      display: grid; 
+      /* 固定 10 欄排版，讓 1A~2E、3A~4E、5A~6E 自然形成三排，間距緊湊 */
+      grid-template-columns: repeat(10, 1fr); 
+      gap: 10px;
+    }
+    
     .class-card {
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px; padding: 10px 0; text-align: center; font-size: 15px; font-weight: 700;
       color: #5f6368; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative; overflow: hidden;
@@ -163,13 +170,18 @@
     
     .class-card.online {
       background: rgba(56, 239, 125, 0.15); border-color: #38ef7d; color: #fff;
-      box-shadow: 0 0 15px rgba(56, 239, 125, 0.3); transform: scale(1.05); text-shadow: 0 0 5px rgba(255,255,255,0.5);
+      box-shadow: 0 0 15px rgba(56, 239, 125, 0.3); transform: scale(1.05); text-shadow: 0 0 5px rgba(255,255,255,0.5); z-index: 1;
     }
     .class-card.online::after {
       content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px;
       background: #38ef7d; border-radius: 50%; box-shadow: 0 0 8px #38ef7d; animation: pulse-online 1.5s infinite alternate;
     }
     @keyframes pulse-online { 0% { opacity: 0.5; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+
+    /* 手機版響應式自動折排 */
+    @media (max-width: 768px) { 
+      .attendance-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    }
 
   </style>
 </head>
@@ -233,10 +245,12 @@
       </div>
     </div>
 
-    <!-- 各班收看燈號看板 -->
+    <!-- 各班收看燈號看板 (單一緊湊網格) -->
     <div class="attendance-board">
       <h3 class="attendance-title">📡 全校課室連線狀態</h3>
-      <div class="class-grid" id="attendance-grid"></div>
+      <div class="attendance-grid" id="attendance-grid">
+        <!-- JS 會在這裡動態插入 30 個班別卡片 -->
+      </div>
     </div>
 
   </main>
@@ -250,7 +264,7 @@
 
   <script>
     // ==========================================
-    // 初始化班別與 UI
+    // 初始化班別選單與緊湊網格
     // ==========================================
     const classList = [];
     const grades = ['1', '2', '3', '4', '5', '6'];
@@ -261,24 +275,33 @@
     const gridEl = document.getElementById('attendance-grid');
 
     classList.forEach(cls => {
+      // 下拉選單選項
       let opt = document.createElement('option'); opt.value = cls; opt.innerText = cls + ' 班'; selectEl.appendChild(opt);
-      let card = document.createElement('div'); card.className = 'class-card'; card.id = 'card-' + cls; card.innerText = cls; gridEl.appendChild(card);
+      
+      // 班級卡片 (直接全塞進 grid)
+      let card = document.createElement('div'); card.className = 'class-card'; card.id = 'card-' + cls; card.innerText = cls; 
+      gridEl.appendChild(card);
     });
 
     // ==========================================
-    // 試算表排程 (支援標題格式化與預告整合)
+    // 日期、試算表排程
     // ==========================================
-    const SHEET_ID = '11PFRIwREa_PJBNog3kLyraoRrd6PRvgBqA8-ATmv5Pk'; 
-    let VIDEO_ID = 'Fv3UPQLC0WE'; 
-
-    let player = null, refreshTimer = null, countdown = 5;
-    let isLiveStarted = false, isAutoRefreshEnabled = false;
+    function getTodayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+    }
 
     function updateTodayDate() {
       const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
       document.getElementById('today-date').innerText = new Date().toLocaleDateString('zh-TW', options);
     }
     updateTodayDate();
+
+    const SHEET_ID = '11PFRIwREa_PJBNog3kLyraoRrd6PRvgBqA8-ATmv5Pk'; 
+    let VIDEO_ID = 'Fv3UPQLC0WE'; 
+
+    let player = null, refreshTimer = null, countdown = 5;
+    let isLiveStarted = false, isAutoRefreshEnabled = false;
 
     function extractVideoId(input) {
       const match = input ? input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/))([\w-]{11})/) : null;
@@ -329,7 +352,6 @@
             if (futureEvents[0].title) finalTitleName = futureEvents[0].title; 
           }
 
-          // 格式化主標題
           document.getElementById('page-title').innerText = finalTitleName ? `${finalTitlePrefix}：${finalTitleName}` : finalTitlePrefix;
 
           if (futureEvents.length > 0) {
@@ -444,7 +466,7 @@
   </script>
 
   <!-- ==========================================
-       Firebase 宣佈與點名系統
+       Firebase 宣佈(含午夜自動重置)與點名系統
        ========================================== -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -465,22 +487,53 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
 
-      // 宣佈系統
+      // 宣佈系統與午夜自動重置機制
       const annEl = document.getElementById('page-announcement');
       const annWrapper = document.getElementById('ann-wrapper');
       const editAnnBtn = document.getElementById('edit-ann-btn');
+      
+      const defaultAnnText = "目前無特別宣佈事項";
 
       db.ref('settings/announcement').on('value', (snapshot) => {
-        const val = snapshot.val();
-        if (val !== null && annEl.contentEditable !== "true") annEl.innerText = val || "目前無特別宣佈事項";
+        const data = snapshot.val();
+        
+        if (data && typeof data === 'object') {
+          // 如果宣佈是有日期的物件，檢查日期是否過期
+          const todayStr = getTodayString();
+          if (data.date !== todayStr) {
+            // 已過期：在本地顯示預設文字，並寫回 Firebase 進行重置
+            if (annEl.contentEditable !== "true") annEl.innerText = defaultAnnText;
+            db.ref('settings/announcement').set({ text: defaultAnnText, date: todayStr });
+          } else {
+            // 當日有效宣佈
+            if (annEl.contentEditable !== "true") annEl.innerText = data.text || defaultAnnText;
+          }
+        } else if (data && typeof data === 'string') {
+          // 為了相容舊資料結構，強制覆寫為帶日期的結構
+          const todayStr = getTodayString();
+          if (annEl.contentEditable !== "true") annEl.innerText = data;
+          db.ref('settings/announcement').set({ text: data, date: todayStr });
+        } else {
+          if(annEl.contentEditable !== "true") annEl.innerText = defaultAnnText;
+        }
       });
+
+      window.showSuccessAnim = function(btnElement) {
+        btnElement.innerText = "✅"; btnElement.classList.add("success");
+        setTimeout(() => { btnElement.innerText = "✏️"; btnElement.classList.remove("success"); }, 1500);
+      };
 
       window.toggleEditAnnouncement = function() {
         if (annEl.contentEditable === "true") {
           annEl.contentEditable = "false"; annEl.classList.remove('editing'); annWrapper.classList.remove('editing'); editAnnBtn.innerText = "⏳";
-          db.ref('settings/announcement').set(annEl.innerText.trim())
-            .then(() => { editAnnBtn.innerText = "✅"; editAnnBtn.style.background = "#38ef7d"; setTimeout(() => { editAnnBtn.innerText = "✏️"; editAnnBtn.style.background = ""; }, 1500); })
-            .catch(err => { console.error(err); alert("❌ 儲存失敗！請確認 Firebase 權限已開放。"); editAnnBtn.innerText = "✏️"; });
+          
+          const newAnn = annEl.innerText.trim();
+          const todayStr = getTodayString();
+          
+          // 儲存文字與儲存當下的日期
+          db.ref('settings/announcement').set({ text: newAnn, date: todayStr })
+            .then(() => showSuccessAnim(editAnnBtn))
+            .catch(err => { alert("❌ 儲存失敗！請確認 Firebase 權限已開放。"); editAnnBtn.innerText = "✏️"; });
         } else {
           annEl.contentEditable = "true"; annEl.classList.add('editing'); annWrapper.classList.add('editing'); annEl.focus(); editAnnBtn.innerText = "💾";
         }
