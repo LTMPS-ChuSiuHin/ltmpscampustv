@@ -32,16 +32,15 @@
     .page-header { text-align: center; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; }
     .title-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
 
+    /* 取消了編輯框樣式，改回純顯示標題 */
     .page-title {
       font-size: 46px; font-weight: 900; margin: 0;
       background: linear-gradient(270deg, #ff8a00, #e52e71, #9d00ff, #00f2fe, #4facfe);
       background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       animation: gradient-text 8s ease infinite; letter-spacing: 1px; padding: 4px 16px; border-radius: 12px;
-      transition: all 0.3s ease; outline: none; min-width: 250px; text-shadow: 0 0 20px rgba(255,255,255,0.1);
+      transition: all 0.3s ease; text-shadow: 0 0 20px rgba(255,255,255,0.1);
     }
     @keyframes gradient-text { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-    .page-title.editing { background: rgba(0, 0, 0, 0.6); -webkit-text-fill-color: #fff; box-shadow: 0 0 0 2px #00f2fe, 0 0 20px rgba(0, 242, 254, 0.5); animation: none; text-shadow: none; }
 
     .edit-btn {
       background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;
@@ -77,7 +76,7 @@
     .live-player-container.fake-fullscreen .video-wrapper { flex: 1 1 auto !important; aspect-ratio: auto !important; height: 100% !important; }
     
     .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; background-color: #000; }
-    .video-wrapper iframe, .video-wrapper #player-slot { width: 100%; height: 100%; display: block; border: 0; }
+    .video-wrapper iframe, .video-wrapper #yt-player { width: 100%; height: 100%; display: block; border: 0; }
 
     .live-custom-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 22px; background: rgba(15, 15, 20, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 14px; color: #fff; }
     .bar-left, .bar-right { display: flex; align-items: center; gap: 14px; }
@@ -115,22 +114,23 @@
     
     <div class="page-header">
       <div class="title-wrapper">
-        <h1 class="page-title" id="page-title" contenteditable="false" spellcheck="false">連線中...</h1>
-        <button class="edit-btn" id="edit-title-btn" onclick="toggleEditTitle()" title="修改標題並同步">✏️</button>
+        <!-- 標題改回純顯示，不提供修改按鈕 -->
+        <h1 class="page-title" id="page-title">載入排程中...</h1>
       </div>
-      <p class="page-subtitle" id="page-subtitle">今天是 <span class="date-highlight" id="today-date">載入中...</span>，歡迎收看 LTMPS 校園電視台直播，請耐心等候節目開始。</p>
+      <p class="page-subtitle" id="page-subtitle">今天是 <span class="date-highlight" id="today-date">載入中...</span>，歡迎收看 LTMPS 校園電視台直播。</p>
       
+      <!-- 保留 Firebase 即時連動的臨時宣佈區塊 -->
       <div class="announcement-wrapper" id="ann-wrapper">
         <span class="announcement-label">🚨 臨時宣佈：</span>
-        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">連線中...</span>
-        <button class="edit-btn small" id="edit-ann-btn" onclick="toggleEditAnnouncement()" title="修改臨時宣佈">✏️</button>
+        <span class="announcement-text" id="page-announcement" contenteditable="false" spellcheck="false">載入中...</span>
+        <button class="edit-btn small" id="edit-ann-btn" onclick="toggleEditAnnouncement()" title="修改臨時宣佈並同步全校">✏️</button>
       </div>
     </div>
 
     <!-- 播放器區塊 -->
     <div class="live-player-container" id="player-container">
       <div class="video-wrapper" id="video-wrapper">
-        <div id="player-slot"></div>
+        <div id="yt-player"></div>
       </div>
 
       <div class="live-custom-bar">
@@ -149,10 +149,8 @@
     </div>
   </main>
 
-  <!-- ==========================================
-       腳本隔離區塊 1：YouTube API (保證不被阻擋)
-       ========================================== -->
   <script>
+    // 獨立 YouTube API
     window.isApiReady = false;
     window.isDataLoaded = false;
     window.onYouTubeIframeAPIReady = function() {
@@ -162,17 +160,16 @@
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
-  <!-- ==========================================
-       腳本隔離區塊 2：試算表與播放邏輯
-       ========================================== -->
   <script>
+    // ==========================================
+    // 試算表排程讀取 (新增 C 欄標題支援)
+    // ==========================================
     const SHEET_ID = '11PFRIwREa_PJBNog3kLyraoRrd6PRvgBqA8-ATmv5Pk'; 
-    let VIDEO_ID = 'Fv3UPQLC0WE'; // ✅ 將備援換成您的真實影片
+    let VIDEO_ID = 'Cx3yJraVcnA'; // 預設備用影片
 
     let player = null, refreshTimer = null, countdown = 5;
     let isLiveStarted = false, isAutoRefreshEnabled = false;
 
-    // 自動日期
     function updateTodayDate() {
       const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
       document.getElementById('today-date').innerText = new Date().toLocaleDateString('zh-TW', options);
@@ -188,69 +185,98 @@
     
     fetch(sheetUrl)
       .then(response => {
-        if (!response.ok) throw new Error("CORS 或權限阻擋");
+        if (!response.ok) throw new Error("Fetch failed");
         return response.text();
       })
       .then(data => {
         if (data) {
           const lines = data.split(/\r?\n/);
-          const today = new Date(), tYear = today.getFullYear(), tMonth = today.getMonth() + 1, tDate = today.getDate();
-          let foundTodayId = null, latestPastId = null, firstAvailableId = null; 
+          const today = new Date();
+          const tYear = today.getFullYear();
+          const tMonth = today.getMonth() + 1;
+          const tDate = today.getDate();
+
+          let foundTodayId = null, foundTodayTitle = null;
+          let latestPastId = null, latestPastTitle = null; 
+          let firstAvailableId = null, firstAvailableTitle = null; 
 
           for (let i = 0; i < lines.length; i++) {
             const cols = lines[i].split(',');
             if (cols.length >= 2) {
-              const rowDate = new Date(cols[0].replace(/['"]/g, '').trim());
-              const extId = extractVideoId(cols[1].replace(/['"]/g, '').trim());
-              if (!isNaN(rowDate.getTime()) && extId) {
-                 if (!firstAvailableId) firstAvailableId = extId;
-                 if (rowDate.getFullYear() === tYear && rowDate.getMonth() + 1 === tMonth && rowDate.getDate() === tDate) { foundTodayId = extId; break; }
-                 if (rowDate <= today) { latestPastId = extId; }
+              const dateStr = cols[0].replace(/['"]/g, '').trim(); 
+              const urlStr = cols[1].replace(/['"]/g, '').trim();  
+              
+              // 取得 C 欄標題 (若有逗號會被拆分，使用 join 拼回，去除前後引號)
+              let titleStr = "";
+              if (cols.length >= 3) {
+                titleStr = cols.slice(2).join(',').replace(/^['"]|['"]$/g, '').trim();
+              }
+              
+              const rowDate = new Date(dateStr);
+              if (!isNaN(rowDate.getTime())) {
+                const rYear = rowDate.getFullYear();
+                const rMonth = rowDate.getMonth() + 1;
+                const rDate = rowDate.getDate();
+                const extId = extractVideoId(urlStr);
+                
+                if (extId) {
+                   if (!firstAvailableId) { 
+                     firstAvailableId = extId; 
+                     firstAvailableTitle = titleStr; 
+                   }
+                   if (rYear === tYear && rMonth === tMonth && rDate === tDate) { 
+                     foundTodayId = extId; 
+                     foundTodayTitle = titleStr;
+                     break; 
+                   }
+                   if (rowDate <= today) { 
+                     latestPastId = extId; 
+                     latestPastTitle = titleStr;
+                   }
+                }
               }
             }
           }
-          if (foundTodayId) VIDEO_ID = foundTodayId; 
-          else if (latestPastId) VIDEO_ID = latestPastId; 
-          else if (firstAvailableId) VIDEO_ID = firstAvailableId; 
+          
+          let finalTitle = "本日電視台直播";
+
+          // 判斷套用哪一天的排程與標題
+          if (foundTodayId) { 
+            VIDEO_ID = foundTodayId; 
+            if (foundTodayTitle) finalTitle = foundTodayTitle;
+          } else if (latestPastId) { 
+            VIDEO_ID = latestPastId; 
+            if (latestPastTitle) finalTitle = latestPastTitle;
+            else finalTitle = "過往電視台重溫";
+          } else if (firstAvailableId) {
+            VIDEO_ID = firstAvailableId;
+            if (firstAvailableTitle) finalTitle = firstAvailableTitle;
+            else finalTitle = "電視台直播預告";
+          }
+
+          // 更新網頁上的主標題
+          document.getElementById('page-title').innerText = finalTitle;
         }
         finishDataLoad(true);
       }).catch(err => {
-        console.warn("⚠️ 試算表權限被阻擋，切換至備援影片:", err);
-        // 若 GitHub Pages 抓不到，會顯示警告，但依然會播放備援影片
-        document.getElementById('live-text').innerText = '⚠️ 無法讀取排程 (權限阻擋)';
-        document.getElementById('live-dot').className = 'dot error';
         finishDataLoad(false);
       });
 
     function finishDataLoad(isSuccess) {
       window.isDataLoaded = true;
       document.getElementById('yt-external-link').href = `https://www.youtube.com/watch?v=${VIDEO_ID}`;
-      
-      if (isSuccess && !document.getElementById('live-text').innerText.includes('⚠️')) {
-        document.getElementById('live-text').innerText = '準備就緒，等待開播';
-      }
+      document.getElementById('live-text').innerText = '準備就緒，等待開播';
       updateStatusText();
       if (window.isApiReady) initPlayer();
     }
 
     function initPlayer() {
-      if (!window.isApiReady || !window.isDataLoaded) return;
-      if (player && typeof player.destroy === 'function') { try { player.destroy(); } catch(e) {} player = null; }
+      if (!window.isApiReady || !window.isDataLoaded || player) return;
 
-      document.getElementById('video-wrapper').innerHTML = '<div id="player-slot"></div>';
-      player = new YT.Player('player-slot', {
+      player = new YT.Player('yt-player', {
         videoId: VIDEO_ID,
         playerVars: { 'autoplay': 1, 'mute': 1, 'rel': 0, 'playsinline': 1, 'fs': 1 },
-        events: { 
-          'onReady': onPlayerReady, 
-          'onStateChange': onPlayerStateChange,
-          'onError': function(e) {
-             // 影片若被設為私人或禁止嵌入，會觸發此錯誤並顯示於畫面上
-             document.getElementById('live-text').innerText = "⚠️ 找不到影片或禁止嵌入";
-             document.getElementById('live-dot').className = 'dot error';
-             stopCountdown();
-          }
-        }
+        events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
       });
     }
 
@@ -297,7 +323,13 @@
       if (!refreshTimer) {
         refreshTimer = setInterval(() => {
           countdown--; updateStatusText();
-          if (countdown <= 0) { countdown = 5; if (!isLiveStarted) initPlayer(); }
+          if (countdown <= 0) {
+            countdown = 5;
+            if (!isLiveStarted && player && typeof player.loadVideoById === 'function') {
+              player.loadVideoById(VIDEO_ID);
+              player.mute(); player.playVideo();
+            }
+          }
         }, 1000);
       }
     }
@@ -307,7 +339,10 @@
       const statusElem = document.getElementById('auto-refresh-status');
       if (statusElem && !isLiveStarted) statusElem.innerText = isAutoRefreshEnabled ? `（將在 ${countdown}s 後刷新檢查）` : `（自動刷新已關閉）`;
     }
-    function manualReload() { if (isLiveStarted) return; countdown = 5; updateStatusText(); initPlayer(); }
+    function manualReload() {
+      if (isLiveStarted) return; countdown = 5; updateStatusText();
+      if (player && typeof player.loadVideoById === 'function') { player.loadVideoById(VIDEO_ID); player.mute(); player.playVideo(); }
+    }
 
     function toggleFullScreen() {
       const fsBtn = document.getElementById('fs-btn'), container = document.getElementById('player-container'), wrapper = document.getElementById('video-wrapper'), iframe = player && player.getIframe ? player.getIframe() : null;
@@ -341,76 +376,60 @@
   </script>
 
   <!-- ==========================================
-       腳本隔離區塊 3：Firebase (獨立 Try-Catch 防崩潰)
+       Firebase 獨立防崩潰區塊 (僅供臨時宣佈使用)
        ========================================== -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script>
     try {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBr0-oNmRN859g6bfGDVjSdA1brJC8CxNs",
-        authDomain: "ltmps-c92a0.firebaseapp.com",
-        projectId: "ltmps-c92a0",
-        storageBucket: "ltmps-c92a0.firebasestorage.app",
-        messagingSenderId: "716255242034",
-        appId: "1:716255242034:web:b25a037869d8a9de6f992b"
-      };
-      
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
+      if (typeof firebase !== 'undefined') {
+        const firebaseConfig = {
+          apiKey: "AIzaSyBr0-oNmRN859g6bfGDVjSdA1brJC8CxNs",
+          authDomain: "ltmps-c92a0.firebaseapp.com",
+          projectId: "ltmps-c92a0",
+          storageBucket: "ltmps-c92a0.firebasestorage.app",
+          messagingSenderId: "716255242034",
+          appId: "1:716255242034:web:b25a037869d8a9de6f992b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-      const titleEl = document.getElementById('page-title');
-      const editTitleBtn = document.getElementById('edit-title-btn');
-      const annEl = document.getElementById('page-announcement');
-      const annWrapper = document.getElementById('ann-wrapper');
-      const editAnnBtn = document.getElementById('edit-ann-btn');
+        const annEl = document.getElementById('page-announcement');
+        const annWrapper = document.getElementById('ann-wrapper');
+        const editAnnBtn = document.getElementById('edit-ann-btn');
 
-      db.collection("settings").doc("live").onSnapshot((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          if (data.title && titleEl.contentEditable !== "true") titleEl.innerText = data.title;
-          if (data.announcement !== undefined && annEl.contentEditable !== "true") annEl.innerText = data.announcement || "目前無特別宣佈事項";
-        } else {
-          if(titleEl.contentEditable !== "true") titleEl.innerText = "本日電視台直播";
-          if(annEl.contentEditable !== "true") annEl.innerText = "目前無特別宣佈事項";
-        }
-      });
+        // 只監聽宣佈
+        db.collection("settings").doc("live").onSnapshot((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.announcement !== undefined && annEl.contentEditable !== "true") {
+              annEl.innerText = data.announcement || "目前無特別宣佈事項";
+            }
+          } else {
+            if(annEl.contentEditable !== "true") annEl.innerText = "目前無特別宣佈事項";
+          }
+        });
 
-      window.showSuccessAnim = function(btnElement) {
-        btnElement.innerText = "✅"; btnElement.classList.add("success");
-        setTimeout(() => { btnElement.innerText = "✏️"; btnElement.classList.remove("success"); }, 1500);
-      };
+        window.showSuccessAnim = function(btnElement) {
+          btnElement.innerText = "✅"; btnElement.classList.add("success");
+          setTimeout(() => { btnElement.innerText = "✏️"; btnElement.classList.remove("success"); }, 1500);
+        };
 
-      window.toggleEditTitle = function() {
-        if (titleEl.contentEditable === "true") {
-          titleEl.contentEditable = "false"; titleEl.classList.remove('editing'); editTitleBtn.innerText = "⏳";
-          const newTitle = titleEl.innerText.trim() || "本日電視台直播";
-          db.collection("settings").doc("live").set({ title: newTitle }, { merge: true })
-            .then(() => showSuccessAnim(editTitleBtn))
-            .catch(err => { alert("❌ 儲存失敗！\n請確定 Firebase Firestore 權限已開放。"); editTitleBtn.innerText = "✏️"; });
-        } else {
-          titleEl.contentEditable = "true"; titleEl.classList.add('editing'); titleEl.focus(); editTitleBtn.innerText = "💾";
-        }
-      };
+        window.toggleEditAnnouncement = function() {
+          if (annEl.contentEditable === "true") {
+            annEl.contentEditable = "false"; annEl.classList.remove('editing'); annWrapper.classList.remove('editing'); editAnnBtn.innerText = "⏳";
+            const newAnn = annEl.innerText.trim();
+            db.collection("settings").doc("live").set({ announcement: newAnn }, { merge: true })
+              .then(() => showSuccessAnim(editAnnBtn))
+              .catch(err => { alert("❌ 儲存失敗，請檢查權限。"); editAnnBtn.innerText = "✏️"; });
+          } else {
+            annEl.contentEditable = "true"; annEl.classList.add('editing'); annWrapper.classList.add('editing'); annEl.focus(); editAnnBtn.innerText = "💾";
+          }
+        };
 
-      window.toggleEditAnnouncement = function() {
-        if (annEl.contentEditable === "true") {
-          annEl.contentEditable = "false"; annEl.classList.remove('editing'); annWrapper.classList.remove('editing'); editAnnBtn.innerText = "⏳";
-          const newAnn = annEl.innerText.trim();
-          db.collection("settings").doc("live").set({ announcement: newAnn }, { merge: true })
-            .then(() => showSuccessAnim(editAnnBtn))
-            .catch(err => { alert("❌ 儲存失敗！\n請確定 Firebase Firestore 權限已開放。"); editAnnBtn.innerText = "✏️"; });
-        } else {
-          annEl.contentEditable = "true"; annEl.classList.add('editing'); annWrapper.classList.add('editing'); annEl.focus(); editAnnBtn.innerText = "💾";
-        }
-      };
-
-      titleEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); toggleEditTitle(); } });
-      annEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); toggleEditAnnouncement(); } });
-
-    } catch (e) {
-      console.warn("Firebase 載入失敗或遭阻擋，已安全略過。", e);
-    }
+        annEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); toggleEditAnnouncement(); } });
+      }
+    } catch (e) { console.warn("Firebase 載入失敗，已忽略此功能。", e); }
   </script>
 </body>
 </html>
